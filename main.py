@@ -32,7 +32,7 @@ class Book(db.Model):
     isbn = db.Column(db.String, nullable=False)
     title = db.Column(db.String, nullable=False)
     publisher = db.Column(db.String, nullable=True)
-    num_pages = db.Column(db.Float, nullable=True)
+    num_pages = db.Column(db.Integer, nullable=True)
     publish_date = db.Column(db.String, nullable=True)
     author = db.Column(db.String, nullable=False)
     category = db.Column(db.String, nullable=True)
@@ -46,7 +46,7 @@ class ISBNForm(FlaskForm):
 
 
 class EditForm(FlaskForm):
-    isbn = StringField('ISBN')
+    isbn = StringField('ISBN', render_kw={'readonly': True})
     title = StringField("Title")
     author = StringField("Author")
     publisher = StringField('Publisher')
@@ -74,7 +74,8 @@ def lookupBook(isbn):
     print(data['items'][0]['selfLink'])
     response = requests.get(data['items'][0]['selfLink'])
     data = response.json()
-
+    filter_criteria = re.compile('<.*?>')
+    description = re.sub(filter_criteria, '', data['volumeInfo']['description'])
     book_details = {
         'isbn': data['volumeInfo']['industryIdentifiers'][1]['identifier'],
         'title': data['volumeInfo']['title'],
@@ -82,7 +83,7 @@ def lookupBook(isbn):
         'publisher': data['volumeInfo']['publisher'],
         'publish_date': data['volumeInfo']['publishedDate'],
         'num_pages': data['volumeInfo']['pageCount'],
-        'description': data['volumeInfo']['description'],
+        'description': description,
         'category': category
     }
 
