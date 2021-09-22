@@ -5,20 +5,19 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, FloatField
 from wtforms.validators import DataRequired
 import requests
+import os
 
-# TODO: Switch API to Google Books
-#     Implement edit and delete buttons for books (delete: DONE, edit: DONE)
-#     Make clicking on each book in index take you to book page (DONE)
-#     Add "back" button to add page (DONE)
-#     Implement search by title (search by author?)
-#     Switch "is this the book you want to add" from book.html to separate page with form (DONE)
+API_KEY = os.getenv('API_KEY')
 
-# TODO tomorrow: Actually port to Google Books
+# TODO:
+#   Implement search by title (search by author?)
+# TODO tomorrow:
 #   Refactor EVERYTHING
 #   Add additional data to Books page
 #   Work on Styling?
 #   Adjust form validators (make ISBN unchangeable in edit_from_db page)
 #   Add "return to default" to edit_from_db page
+
 
 
 app = Flask(__name__)
@@ -36,6 +35,7 @@ class Book(db.Model):
     num_pages = db.Column(db.Float, nullable=True)
     publish_date = db.Column(db.String, nullable=True)
     author = db.Column(db.String, nullable=False)
+    category = db.Column(db.String, nullable=True)
     description = db.Column(db.String, nullable=True)
 
 
@@ -53,6 +53,7 @@ class EditForm(FlaskForm):
     num_pages = StringField('Number of Pages')
     publish_date = StringField('Publish Date')
     description = StringField('Description')
+    category = StringField('Category/Genre')
     submit = SubmitField('Submit')
 
 
@@ -61,32 +62,29 @@ db.create_all()
 
 # Gets book details for a given ISBN
 def lookupBook(isbn):
-    # Call openlibrary API to get initial details
-    response = requests.get(f'https://openlibrary.org/isbn/{isbn}.json')
+
+    response = requests.get(f'https://www.googleapis.com/books/v1/volumes?q={isbn}&key={API_KEY}')
     data = response.json()
-    authorURL = data['authors'][0]['key']  # Get API endpoint for author
-    descriptionURL = data['works'][0]['key']  # Get API endpoint for book description
+
+    try:
+        category = data['items'][0]['volumeInfo']['categories'][0]
+    except KeyError:
+        category = ''
+
+    print(data['items'][0]['selfLink'])
+    response = requests.get(data['items'][0]['selfLink'])
+    data = response.json()
 
     book_details = {
-        'title': data['title'],
-        'isbn': isbn,
-        'publisher': data['publishers'][0],
-        'num_pages': data['number_of_pages'],
-        'publish_date': data['publish_date']
+        'isbn': data['volumeInfo']['industryIdentifiers'][1]['identifier'],
+        'title': data['volumeInfo']['title'],
+        'author': data['volumeInfo']['authors'][0],
+        'publisher': data['volumeInfo']['publisher'],
+        'publish_date': data['volumeInfo']['publishedDate'],
+        'num_pages': data['volumeInfo']['pageCount'],
+        'description': data['volumeInfo']['description'],
+        'category': category
     }
-
-    # Call author endpoint to get author name for book details
-    response = requests.get(f'https://openlibrary.org{authorURL}.json')
-    data = response.json()
-    book_details['author'] = data['name']
-
-    # Call description endpoint to get book description
-    response = requests.get(f'https://openlibrary.org{descriptionURL}.json')
-    data = response.json()
-    try:
-        book_details['description'] = data['description']['value']
-    except KeyError:
-        book_details['description'] = ''
 
     return book_details
 
@@ -120,7 +118,8 @@ def edit_book():
             num_pages=request.form.get('num_pages'),
             publish_date=request.form.get('publish_date'),
             author=request.form.get('author'),
-            description=request.form.get('description')
+            description=request.form.get('description'),
+            category = request.form.get('category')
         )
         db.session.add(book_to_add)
         db.session.commit()
@@ -137,6 +136,7 @@ def edit_book():
     edit_form.publisher.data = details['publisher']
     edit_form.num_pages.data = details['num_pages']
     edit_form.publish_date.data = details['publish_date']
+    edit_form.category.data = details['category']
     edit_form.description.data = details['description']
 
     return render_template('edit.html', form=edit_form, book=details)
@@ -156,6 +156,7 @@ def edit_from_db():
         book_to_edit.title = request.form.get('title')
         book_to_edit.publisher = request.form.get('publisher')
         book_to_edit.num_pages = request.form.get('num_pages')
+        book_to_edit.category = request.form.get('category')
         book_to_edit.publish_date = request.form.get('publish_date')
         book_to_edit.author = request.form.get('author')
         book_to_edit.description = request.form.get('description')
@@ -168,6 +169,7 @@ def edit_from_db():
     edit_form.title.data = book_to_edit.title
     edit_form.publisher.data = book_to_edit.publisher
     edit_form.num_pages.data = book_to_edit.num_pages
+    edit_form.category.data = book_to_edit.category
     edit_form.publish_date.data = book_to_edit.publish_date
     edit_form.description.data = book_to_edit.description
 
