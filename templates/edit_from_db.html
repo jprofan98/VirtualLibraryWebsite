@@ -6,19 +6,32 @@ Home
 {% endblock %}
 
 {% block content%}
-<form method="post">
-	<input hidden="hidden" value="{{book_id}}">
-	{{wtf.form_field(form.isbn)}}
-	{{wtf.form_field(form.title)}}
-	{{wtf.form_field(form.author)}}
-	{{wtf.form_field(form.publisher)}}
-	{{wtf.form_field(form.publish_date)}}
-	{{wtf.form_field(form.num_pages)}}
-	{{wtf.form_field(form.category)}}
-	{{wtf.form_field(form.description)}}
-	{{wtf.form_field(form.submit)}}
-	<button type="button"><a href="{{url_for('home')}}">Back</a></button>
-</form>
+<div class="container">
+	<form method="post">
+		<div class="form-row">
+			<div class="form-group">{{wtf.form_field(form.isbn)}}</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-6">{{wtf.form_field(form.title)}}</div>
+			<div class="form-group col-md-6">{{wtf.form_field(form.author)}}</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-6"> {{wtf.form_field(form.publisher)}}</div>
+			<div class="form-group col-md-6"> {{wtf.form_field(form.publish_date)}}</div>
+		</div>
+
+		<div class="form-row">
+			<div class="form-group"> {{wtf.form_field(form.num_pages)}}</div>
+		</div>
+
+		{{wtf.form_field(form.category)}}
+		{{wtf.form_field(form.description)}}
+		<input hidden="hidden" value="{{book_id}}">
+		{{wtf.form_field(form.submit)}}
+		<button type="button" class="btn"><a href="{{url_for('home')}}">Back</a></button>
+	</form>
+</div>
+
 
 {% endblock %}
 

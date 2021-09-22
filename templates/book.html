@@ -8,11 +8,12 @@ Book
 {% block content%}
 <div>
 	<h1>PLEASE STYLE ME</h1>
-	<h2>{{book['title']}} ({{book['publish_date']}})</h2>
+	<h2>{{book['title']}} ({{book['num_pages']}} pages)</h2>
 	<h3>by {{book['author']}}</h3>
-
+	<h4> Published {{book['publish_date']}} by {{book['publisher']}}</h4>
 	<p>{{book['description']}}</p>
-
+	<br>
+	<h5>Genres: {{book['category']}}</h5>
 </div>
 
 {% endblock %}

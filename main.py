@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, FloatField
+from wtforms import StringField, SubmitField, SelectField, FloatField, TextAreaField
 from wtforms.validators import DataRequired
 import requests
 import os
@@ -52,7 +52,7 @@ class EditForm(FlaskForm):
     publisher = StringField('Publisher')
     num_pages = StringField('Number of Pages')
     publish_date = StringField('Publish Date')
-    description = StringField('Description')
+    description = TextAreaField('Description')
     category = StringField('Category/Genre')
     submit = SubmitField('Submit')
 
