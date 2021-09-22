@@ -6,6 +6,11 @@ Add
 {% endblock %}
 
 {% block content%}
-<h1>ISBN Add</h1>
-{{wtf.quick_form(form, novalidate=True)}}
+<h1>ISBN Add (seriously, I need styling)</h1>
+<form method="post", action="{{url_for('add_by_isbn')}}">
+	{{form.csrf_token}}
+	{{wtf.form_field(form.isbn)}}
+	{{wtf.form_field(form.submit)}}
+	<button type="button"><a href="{{url_for('home')}}">Back</a></button>
+</form>
 {% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'bootstrap/base.html' %}
+{% import 'bootstrap/wtf.html' as wtf%}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content%}
+<form method="post">
+	<input hidden="hidden" value="{{book_id}}">
+	{{wtf.form_field(form.isbn)}}
+	{{wtf.form_field(form.title)}}
+	{{wtf.form_field(form.author)}}
+	{{wtf.form_field(form.publisher)}}
+	{{wtf.form_field(form.publish_date)}}
+	{{wtf.form_field(form.num_pages)}}
+	{{wtf.form_field(form.description)}}
+	{{wtf.form_field(form.submit)}}
+	<button type="button"><a href="{{url_for('home')}}">Back</a></button>
+</form>
+
+{% endblock %}

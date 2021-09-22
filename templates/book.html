@@ -7,14 +7,12 @@ Book
 
 {% block content%}
 <div>
-	<h1>{{book['title']}} ({{book['publish_date']}})</h1>
+	<h1>PLEASE STYLE ME</h1>
+	<h2>{{book['title']}} ({{book['publish_date']}})</h2>
 	<h3>by {{book['author']}}</h3>
 
 	<p>{{book['description']}}</p>
 
-	<h3>Is this the book you want to add?</h3>
-	<button>Yes</button>
-	<button><a href="{{url_for('add_by_isbn')}}">No</a></button>
 </div>
 
 {% endblock %}
